@@ -1,0 +1,20 @@
+{
+  "owner": "JR-Agent-Skills",
+  "slug": "project-indexer",
+  "displayName": "Project Indexer",
+  "description": "Generate and use project index for quick codebase understanding in new Claude Code sessions",
+  "version": "1.0.0",
+  "tags": ["productivity", "codebase", "indexing", "navigation", "developer-tools"],
+  "license": "MIT",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1738598400000
+  },
+  "history": [
+    {
+      "version": "1.0.0",
+      "publishedAt": 1738598400000,
+      "notes": "Initial release with full indexing workflow"
+    }
+  ]
+}
