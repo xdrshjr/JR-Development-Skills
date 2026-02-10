@@ -72,6 +72,38 @@ Structured requirements clarification and specification planning before implemen
 /planning-with-discovery
 ```
 
+---
+
+### 🐛 Bug Diagnosis
+
+Systematic bug diagnosis and fixing through structured problem analysis and verified fixes.
+
+**Key Features:**
+- Dual-mode operation (semi-automatic/fully automatic)
+- Structured problem intake with diagnostic questions
+- Index-aware code analysis with shallow-first strategy
+- Hypothesis-driven diagnosis with alternatives
+- Immediate fixes with optional test verification
+- Lightweight tracking via diagnosis summaries
+
+**Use Cases:**
+- Diagnosing and fixing bugs systematically
+- Understanding root causes before fixing
+- Verifying fixes with automated tests
+- Tracking bug resolutions for future reference
+
+[📖 Read More](./bug-diagnosis/README.md)
+
+**Trigger Phrases:**
+```
+"diagnose this bug"
+"find the problem"
+"debug this issue"
+"troubleshoot"
+"查找bug"
+/bug-diagnosis
+```
+
 ## Installation
 
 ### Manual Installation
@@ -86,6 +118,7 @@ git clone https://github.com/yourusername/JR-Development-Skills.git
 # Copy individual skills
 cp -r JR-Development-Skills/project-indexer ~/.claude/skills/
 cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
+cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 ```
 
 3. Restart Claude Code or reload skills (if applicable)
@@ -99,6 +132,10 @@ In Claude Code, type:
 or
 ```
 /planning-with-discovery
+```
+or
+```
+/bug-diagnosis
 ```
 
 If the skill activates, installation was successful.
@@ -160,8 +197,12 @@ JR-Development-Skills/
 │   └── templates/                     # Index templates
 │       ├── index-template.md
 │       └── config-template.md
-└── planning-with-discovery/           # Requirements planning skill
-    └── SKILL.md                       # Skill implementation guide
+├── planning-with-discovery/           # Requirements planning skill
+│   └── SKILL.md                       # Skill implementation guide
+└── bug-diagnosis/                     # Bug diagnosis skill
+    ├── SKILL.md                       # Skill implementation guide
+    ├── README.md                      # User documentation
+    └── _meta.json                     # Skill metadata
 ```
 
 ## Requirements
@@ -182,6 +223,7 @@ Skills use only standard Claude Code tools (Read, Write, Edit, Glob, Grep, Bash,
 
 Future skills under consideration:
 
+- [x] **Bug Diagnosis** - Systematic bug finding and fixing ✓ Added
 - [ ] **Code Review Assistant** - Automated code quality checks
 - [ ] **Test Generation** - Auto-generate test cases from specifications
 - [ ] **Documentation Generator** - Create API docs from code
