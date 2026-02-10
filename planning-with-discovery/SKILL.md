@@ -95,26 +95,32 @@ Once the user agrees to start writing, proceed in this exact order:
 - Describe interfaces, data models, and behavior - not implementation details
 - Each spec file should be self-contained and focused on one aspect/module
 
-#### Step 2.3: TODO Files
+#### Step 2.3: TODO Files (Optional)
 
-1. After ALL spec files are approved, generate TODO files
-2. Create one TODO file per spec file: `todos/01-<name>.md`, `todos/02-<name>.md`, etc.
-3. Each TODO file contains:
-   - Reference to its corresponding spec file
-   - A checklist of actionable tasks (using `- [ ]` markdown checkboxes)
-   - Tasks ordered by implementation sequence
-   - Each task described clearly enough for a developer to act on
-4. Present ALL TODO files together as a batch for review
-5. Ask the user to review and approve (or request changes)
-6. Apply any changes and re-present until approved
+1. After ALL spec files are approved, ask the user if they want TODO files generated:
+   - Use `AskUserQuestion` to present the choice
+   - Option 1: "Generate TODO files" - Create actionable task checklists for implementation
+   - Option 2: "Skip TODO files" - Complete planning with specs only
+2. If the user chooses to generate TODO files:
+   a. Create one TODO file per spec file: `todos/01-<name>.md`, `todos/02-<name>.md`, etc.
+   b. Each TODO file contains:
+      - Reference to its corresponding spec file
+      - A checklist of actionable tasks (using `- [ ]` markdown checkboxes)
+      - Tasks ordered by implementation sequence
+      - Each task described clearly enough for a developer to act on
+   c. Present ALL TODO files together as a batch for review
+   d. Ask the user to review and approve (or request changes)
+   e. Apply any changes and re-present until approved
+3. If the user chooses to skip TODO files, proceed directly to Phase 3
 
 ### Phase 3: Completion
 
 1. Present a summary of everything generated:
    - Master plan file path
    - List of all spec files
-   - List of all TODO files
-2. Ask: "Ready to start implementation, or do you want to revisit any part of the plan?"
+   - List of all TODO files (if generated) or note that TODO files were not created
+2. If TODO files were generated, ask: "Ready to start implementation, or do you want to revisit any part of the plan?"
+3. If TODO files were NOT generated, ask: "The planning phase is complete. Would you like to generate TODO files now, or are you ready to proceed with your own implementation approach?"
 
 ## Output Structure
 
@@ -126,12 +132,14 @@ docs/plans/<topic-name>/
 │   ├── 02-<name>.md
 │   ├── 03-<name>.md
 │   └── ...
-└── todos/                  # Actionable task checklists
+└── todos/                  # [OPTIONAL] Actionable task checklists
     ├── 01-<name>.md
     ├── 02-<name>.md
     ├── 03-<name>.md
     └── ...
 ```
+
+**Note:** The `todos/` directory is only created if the user chooses to generate TODO files.
 
 ## Key Principles
 
@@ -142,7 +150,8 @@ docs/plans/<topic-name>/
 - **No real code** - Pseudo-code and diagrams only; this is a planning tool, not a coding tool
 - **Language flexibility** - Determine the working language at the start and stay consistent
 - **Incremental refinement** - Each Q&A round builds on all previous knowledge
-- **Batch TODO review** - TODOs are derived from approved specs, so lighter review is appropriate
+- **Optional TODO generation** - Let users decide if they need task checklists or prefer their own implementation approach
+- **User-driven TODO decision** - After spec approval, explicitly ask if TODO files should be generated
 
 ## Red Flags
 
@@ -151,7 +160,8 @@ docs/plans/<topic-name>/
 - Skipping user approval on any spec file
 - Asking fewer than 10 questions per round
 - Repeating questions already answered in previous rounds
-- Generating TODO tasks that don't trace back to approved specs
+- Generating TODO files without asking the user first
+- Generating TODO tasks that don't trace back to approved specs (when TODOs are generated)
 - Changing the working language mid-process without user consent
 - Moving to the next spec file before the current one is approved
 
