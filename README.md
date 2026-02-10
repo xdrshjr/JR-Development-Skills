@@ -74,6 +74,37 @@ Structured requirements clarification and specification planning before implemen
 
 ---
 
+### 📝 Spec to Tasks
+
+Converts project specification documents into structured TODO task plans with full traceability.
+
+**Key Features:**
+- Bilingual support (English/Chinese)
+- Reads specification documents (Markdown, Word)
+- Optional requirements clarification phase
+- Generates structured TODO task files (3/5/10 tasks)
+- Full traceability from tasks back to source requirements
+- Pseudocode-based planning (no implementation code)
+
+**Use Cases:**
+- Breaking down specifications into actionable tasks
+- Creating development task lists from requirements
+- Maintaining traceability between specs and implementation
+- Planning development phases systematically
+
+[📖 Read More](./spec-to-tasks/SKILL.md)
+
+**Trigger Phrases:**
+```
+"create tasks from specs"
+"generate TODO from documents"
+"break down project into tasks"
+"从规格生成任务"
+/spec-to-tasks
+```
+
+---
+
 ### 🐛 Bug Diagnosis
 
 Systematic bug diagnosis and fixing through structured problem analysis and verified fixes.
@@ -118,6 +149,7 @@ git clone https://github.com/yourusername/JR-Development-Skills.git
 # Copy individual skills
 cp -r JR-Development-Skills/project-indexer ~/.claude/skills/
 cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
+cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 ```
 
@@ -132,6 +164,10 @@ In Claude Code, type:
 or
 ```
 /planning-with-discovery
+```
+or
+```
+/spec-to-tasks
 ```
 or
 ```
@@ -198,6 +234,8 @@ JR-Development-Skills/
 │       ├── index-template.md
 │       └── config-template.md
 ├── planning-with-discovery/           # Requirements planning skill
+│   └── SKILL.md                       # Skill implementation guide
+├── spec-to-tasks/                     # Spec to TODO conversion skill
 │   └── SKILL.md                       # Skill implementation guide
 └── bug-diagnosis/                     # Bug diagnosis skill
     ├── SKILL.md                       # Skill implementation guide

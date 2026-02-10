@@ -74,6 +74,38 @@ JR Development Skills 是一个专门的 Claude Code 技能集合，旨在增强
 
 ---
 
+### 📝 规格转任务 (Spec to Tasks)
+
+将项目规格文档转换为具有完整追溯性的结构化 TODO 任务计划。
+
+**核心功能：**
+- 双语支持（英文/中文）
+- 读取规格文档（Markdown、Word）
+- 可选的需求澄清阶段
+- 生成结构化 TODO 任务文件（3/5/10 个任务）
+- 从任务到源需求的完整追溯性
+- 基于伪代码的规划（不包含实现代码）
+
+**使用场景：**
+- 将规格文档分解为可执行任务
+- 从需求创建开发任务列表
+- 维护规格与实现之间的追溯性
+- 系统化地规划开发阶段
+
+[📖 了解更多](./spec-to-tasks/SKILL.md)
+
+**触发短语：**
+```
+"create tasks from specs"
+"generate TODO from documents"
+"从规格生成任务"
+"将文档转为TODO"
+"分解项目任务"
+/spec-to-tasks
+```
+
+---
+
 ### 🐛 Bug 诊断 (Bug Diagnosis)
 
 通过结构化问题分析和验证修复进行系统化的 Bug 诊断和修复。
@@ -118,6 +150,7 @@ git clone https://github.com/yourusername/JR-Development-Skills.git
 # 复制单个技能
 cp -r JR-Development-Skills/project-indexer ~/.claude/skills/
 cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
+cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 ```
 
@@ -132,6 +165,10 @@ cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 或
 ```
 /planning-with-discovery
+```
+或
+```
+/spec-to-tasks
 ```
 或
 ```
@@ -198,6 +235,8 @@ JR-Development-Skills/
 │       ├── index-template.md
 │       └── config-template.md
 ├── planning-with-discovery/           # 需求规划技能
+│   └── SKILL.md                       # 技能实现指南
+├── spec-to-tasks/                     # 规格转任务技能
 │   └── SKILL.md                       # 技能实现指南
 └── bug-diagnosis/                     # Bug 诊断技能
     ├── SKILL.md                       # 技能实现指南
