@@ -37,17 +37,19 @@ Guide developers through structured requirements discovery via iterative Q&A rou
 ### Phase 1: Requirements Discovery (Iterative Q&A)
 
 **Each round:**
-1. Present exactly 10 numbered questions as a batch
+1. Prepare exactly 8 questions, each with 4 candidate answers
 2. Questions should be driven entirely by the agent's judgment - ask whatever is most important to clarify based on:
    - The original task description
    - All previous answers from the user
    - Gaps, ambiguities, or risks identified so far
-3. Wait for the user to answer (they may answer all, some, or add extra context)
-4. Digest the answers and update your internal understanding
+3. Deliver the 8 questions via two `AskUserQuestion` calls (4 questions each)
+   - Each question gets exactly 4 candidate answer options (the tool automatically appends an "Other" option for free-text input, giving 5 total choices per question)
+   - The user selects one candidate per question OR picks "Other" to write a custom response
+4. Digest all answers and update your internal understanding
 
 **After each round, evaluate readiness:**
 - If enough information has been gathered to write a meaningful spec, ask: "I believe I have enough information to start writing the plan. Ready to proceed, or would you like another round of questions?"
-- If significant gaps remain, proceed directly with another round of 10 questions
+- If significant gaps remain, proceed directly with another round of 8 questions
 - The user can override at any time by typing keywords like "start writing", "generate plan", "begin spec", "write the plan", or similar - honor this immediately
 
 **Question quality guidelines:**
@@ -56,6 +58,19 @@ Guide developers through structured requirements discovery via iterative Q&A rou
 - Build on previous answers - go deeper, not wider, as rounds progress
 - Ask about risks, failure modes, and "what if" scenarios in later rounds
 - Cover both functional and non-functional aspects naturally
+
+**Candidate answer guidelines:**
+- Each question must have exactly 4 options (the 5th "Other" option is added automatically by the tool)
+- Options should span a **spectrum of plausible directions** for that question:
+  - From conservative/minimal to ambitious/comprehensive
+  - From simple/standard to complex/custom
+  - From common industry practice to domain-specific approach
+- Options must be **mutually distinct** - avoid two options that say roughly the same thing
+- Options should be **concise but specific** - one sentence or short phrase, not a paragraph
+- Options should be **contextually grounded** in what has been discussed so far, not generic
+- Do NOT include an "I don't know" or "Not sure" option - that is what the "Other" free-text option covers
+- When asking about technical choices (e.g., architecture, data model), include concrete named approaches (e.g., "REST API with PostgreSQL" rather than "Option A")
+- When asking about scope or priority, frame options as specific trade-offs (e.g., "Support only email login at launch" vs. "Support email + OAuth from day one")
 
 ### Phase 2: Spec Writing (Sequential with Review)
 
@@ -155,7 +170,8 @@ docs/plans/<topic-name>/
 
 ## Key Principles
 
-- **10 questions per round** - Always present exactly 10, no more, no less
+- **8 questions per round** - Always present exactly 8, delivered via two `AskUserQuestion` calls of 4 each
+- **Candidate answers** - Every question offers 4 agent-crafted candidate options plus an automatic "Other" for free-text input
 - **Agent-driven questions** - No rigid categories; ask what matters most right now
 - **User controls the pace** - User can trigger spec writing at any time
 - **Sequential approval** - Each spec file must be approved before the next is written
@@ -171,7 +187,9 @@ docs/plans/<topic-name>/
 - Starting to write spec files before the user has agreed to begin
 - Writing real/concrete code instead of pseudo-code
 - Skipping user approval on any spec file
-- Asking fewer than 10 questions per round
+- Asking fewer or more than 8 questions per round
+- Providing fewer than 4 or more than 4 candidate answers per question
+- Providing generic or overlapping candidate answers that don't offer real choice
 - Repeating questions already answered in previous rounds
 - Starting to write spec files without confirming the count with the user
 - Ignoring the user's chosen spec count and creating a different number of files
