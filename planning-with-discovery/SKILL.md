@@ -76,9 +76,25 @@ Once the user agrees to start writing, proceed in this exact order:
 4. If the user requests changes, apply them and re-present until approved
 5. Only proceed to spec files after the master plan is approved
 
-#### Step 2.2: Detailed Spec Files
+#### Step 2.2: Planning Configuration
 
-1. Based on the approved master plan, determine how many spec files are needed
+After the master plan is approved, configure the planning scope with **two** `AskUserQuestion` calls:
+
+1. **Spec file count** — Analyze the master plan and recommend a number of spec files with a brief rationale, then ask:
+   - Option 1: `"N files (Recommended)"` — the agent's recommended count with a one-line reason
+   - Option 2: `"1-3 files (Compact)"` — for simple projects
+   - Option 3: `"4-7 files (Balanced)"` — for moderate complexity
+   - Option 4: `"8-10 files (Comprehensive)"` — for large projects
+   - (User can always enter a custom number via the automatic "Other" option)
+   - If the user selects a range, follow up to confirm the exact number within that range
+
+2. **TODO file preference** — Ask whether to generate TODO files after specs are complete:
+   - Option 1: `"Yes, generate TODO files"` — create actionable task checklists after spec approval
+   - Option 2: `"No, specs only"` — complete planning with specs only
+
+#### Step 2.3: Detailed Spec Files
+
+1. Using the spec file count confirmed by the user in Step 2.2, create the spec files
 2. Name them with numeric prefixes: `specs/01-<name>.md`, `specs/02-<name>.md`, etc.
 3. For EACH spec file, sequentially:
    a. Write the file using natural language descriptions, pseudo-code, and text-based diagrams (mermaid syntax)
@@ -95,23 +111,19 @@ Once the user agrees to start writing, proceed in this exact order:
 - Describe interfaces, data models, and behavior - not implementation details
 - Each spec file should be self-contained and focused on one aspect/module
 
-#### Step 2.3: TODO Files (Optional)
+#### Step 2.4: TODO Files (Conditional)
 
-1. After ALL spec files are approved, ask the user if they want TODO files generated:
-   - Use `AskUserQuestion` to present the choice
-   - Option 1: "Generate TODO files" - Create actionable task checklists for implementation
-   - Option 2: "Skip TODO files" - Complete planning with specs only
-2. If the user chooses to generate TODO files:
-   a. Create one TODO file per spec file: `todos/01-<name>.md`, `todos/02-<name>.md`, etc.
-   b. Each TODO file contains:
-      - Reference to its corresponding spec file
-      - A checklist of actionable tasks (using `- [ ]` markdown checkboxes)
-      - Tasks ordered by implementation sequence
-      - Each task described clearly enough for a developer to act on
-   c. Present ALL TODO files together as a batch for review
-   d. Ask the user to review and approve (or request changes)
-   e. Apply any changes and re-present until approved
-3. If the user chooses to skip TODO files, proceed directly to Phase 3
+If the user chose to generate TODO files in Step 2.2, execute this step; otherwise skip to Phase 3.
+
+1. Create one TODO file per spec file: `todos/01-<name>.md`, `todos/02-<name>.md`, etc.
+2. Each TODO file contains:
+   - Reference to its corresponding spec file
+   - A checklist of actionable tasks (using `- [ ]` markdown checkboxes)
+   - Tasks ordered by implementation sequence
+   - Each task described clearly enough for a developer to act on
+3. Present ALL TODO files together as a batch for review
+4. Ask the user to review and approve (or request changes)
+5. Apply any changes and re-present until approved
 
 ### Phase 3: Completion
 
@@ -150,8 +162,9 @@ docs/plans/<topic-name>/
 - **No real code** - Pseudo-code and diagrams only; this is a planning tool, not a coding tool
 - **Language flexibility** - Determine the working language at the start and stay consistent
 - **Incremental refinement** - Each Q&A round builds on all previous knowledge
+- **User-controlled scope** - User decides spec count and TODO preference after master plan approval
+- **Agent recommends, user decides** - Agent analyzes the master plan and proposes a recommended spec count; user makes the final call
 - **Optional TODO generation** - Let users decide if they need task checklists or prefer their own implementation approach
-- **User-driven TODO decision** - After spec approval, explicitly ask if TODO files should be generated
 
 ## Red Flags
 
@@ -160,6 +173,8 @@ docs/plans/<topic-name>/
 - Skipping user approval on any spec file
 - Asking fewer than 10 questions per round
 - Repeating questions already answered in previous rounds
+- Starting to write spec files without confirming the count with the user
+- Ignoring the user's chosen spec count and creating a different number of files
 - Generating TODO files without asking the user first
 - Generating TODO tasks that don't trace back to approved specs (when TODOs are generated)
 - Changing the working language mid-process without user consent
