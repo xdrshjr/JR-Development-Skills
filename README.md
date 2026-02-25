@@ -105,6 +105,39 @@ Converts project specification documents into structured TODO task plans with fu
 
 ---
 
+### 🔬 Code Diagnosis
+
+Multi-agent code scanning and project diagnosis with three-way confirmation from Google Core Team engineers.
+
+**Key Features:**
+- Three-way confirmation: Scanner → Reviewer → QA (separation of powers)
+- Google Core Team engineer personas for rigorous review
+- Configurable scan depth, categories, and output detail
+- Parallel multi-agent scanning for efficiency
+- Structured reports with code health scoring
+- Multi-language support (English/Chinese)
+
+**Use Cases:**
+- Comprehensive code quality audits
+- Security vulnerability scanning
+- Pre-release codebase health checks
+- Onboarding code review for new team members
+- Architecture and design pattern analysis
+
+[📖 Read More](./code-diagnosis/README.md)
+
+**Trigger Phrases:**
+```
+"scan this project"
+"code diagnosis"
+"audit the codebase"
+"project health check"
+"代码诊断"
+/code-diagnosis
+```
+
+---
+
 ### 🐛 Bug Diagnosis
 
 Systematic bug diagnosis and fixing through structured problem analysis and verified fixes.
@@ -150,6 +183,7 @@ git clone https://github.com/yourusername/JR-Development-Skills.git
 cp -r JR-Development-Skills/project-indexer ~/.claude/skills/
 cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
 cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
+cp -r JR-Development-Skills/code-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 ```
 
@@ -168,6 +202,10 @@ or
 or
 ```
 /spec-to-tasks
+```
+or
+```
+/code-diagnosis
 ```
 or
 ```
@@ -237,6 +275,10 @@ JR-Development-Skills/
 │   └── SKILL.md                       # Skill implementation guide
 ├── spec-to-tasks/                     # Spec to TODO conversion skill
 │   └── SKILL.md                       # Skill implementation guide
+├── code-diagnosis/                    # Multi-agent code scanning skill
+│   ├── SKILL.md                       # Skill implementation guide
+│   ├── README.md                      # User documentation
+│   └── _meta.json                     # Skill metadata
 └── bug-diagnosis/                     # Bug diagnosis skill
     ├── SKILL.md                       # Skill implementation guide
     ├── README.md                      # User documentation
@@ -262,6 +304,7 @@ Skills use only standard Claude Code tools (Read, Write, Edit, Glob, Grep, Bash,
 Future skills under consideration:
 
 - [x] **Bug Diagnosis** - Systematic bug finding and fixing ✓ Added
+- [x] **Code Diagnosis** - Multi-agent code scanning with three-way confirmation ✓ Added
 - [ ] **Code Review Assistant** - Automated code quality checks
 - [ ] **Test Generation** - Auto-generate test cases from specifications
 - [ ] **Documentation Generator** - Create API docs from code

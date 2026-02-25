@@ -1,2 +1,4 @@
 # Documentation and planning files that should not be uploaded
 docs/plans/bug-diagnosis/
+docs/scan-report/
+docs/scan-report-*/

@@ -106,6 +106,39 @@ JR Development Skills 是一个专门的 Claude Code 技能集合，旨在增强
 
 ---
 
+### 🔬 代码诊断 (Code Diagnosis)
+
+多 Agent 代码扫描与项目诊断，采用 Google 核心团队工程师三权分立确认机制。
+
+**核心功能：**
+- 三权分立确认：扫描员 → 审查员 → QA（分权制衡）
+- Google 核心团队工程师角色驱动的严格审查
+- 可配置扫描深度、诊断类别和输出详细程度
+- 并行多 Agent 扫描提升效率
+- 结构化报告含代码健康评分
+- 双语支持（英文/中文）
+
+**使用场景：**
+- 全面的代码质量审计
+- 安全漏洞扫描
+- 发布前代码健康检查
+- 新团队成员代码审查入门
+- 架构与设计模式分析
+
+[📖 了解更多](./code-diagnosis/README.md)
+
+**触发短语：**
+```
+"scan this project"
+"code diagnosis"
+"代码诊断"
+"扫描项目"
+"代码审计"
+/code-diagnosis
+```
+
+---
+
 ### 🐛 Bug 诊断 (Bug Diagnosis)
 
 通过结构化问题分析和验证修复进行系统化的 Bug 诊断和修复。
@@ -151,6 +184,7 @@ git clone https://github.com/yourusername/JR-Development-Skills.git
 cp -r JR-Development-Skills/project-indexer ~/.claude/skills/
 cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
 cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
+cp -r JR-Development-Skills/code-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 ```
 
@@ -169,6 +203,10 @@ cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 或
 ```
 /spec-to-tasks
+```
+或
+```
+/code-diagnosis
 ```
 或
 ```
@@ -238,6 +276,10 @@ JR-Development-Skills/
 │   └── SKILL.md                       # 技能实现指南
 ├── spec-to-tasks/                     # 规格转任务技能
 │   └── SKILL.md                       # 技能实现指南
+├── code-diagnosis/                    # 多 Agent 代码扫描技能
+│   ├── SKILL.md                       # 技能实现指南
+│   ├── README.md                      # 用户文档
+│   └── _meta.json                     # 技能元数据
 └── bug-diagnosis/                     # Bug 诊断技能
     ├── SKILL.md                       # 技能实现指南
     ├── README.md                      # 用户文档
@@ -263,6 +305,7 @@ JR-Development-Skills/
 未来考虑的技能：
 
 - [x] **Bug 诊断** - 系统化的 Bug 查找和修复 ✓ 已添加
+- [x] **代码诊断** - 多 Agent 代码扫描与三权分立确认 ✓ 已添加
 - [ ] **代码审查助手** - 自动代码质量检查
 - [ ] **测试生成器** - 从规范自动生成测试用例
 - [ ] **文档生成器** - 从代码创建 API 文档

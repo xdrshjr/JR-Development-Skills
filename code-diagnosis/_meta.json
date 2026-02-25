@@ -1,0 +1,20 @@
+{
+  "owner": "JR-Agent-Skills",
+  "slug": "code-diagnosis",
+  "displayName": "Code Diagnosis",
+  "description": "Multi-agent code scanning and project diagnosis with three-way confirmation (Scanner, Reviewer, QA) from Google Core Team engineers",
+  "version": "1.0.0",
+  "tags": ["code-review", "diagnosis", "scanning", "multi-agent", "quality", "security", "developer-tools"],
+  "license": "MIT",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1740528000000
+  },
+  "history": [
+    {
+      "version": "1.0.0",
+      "publishedAt": 1740528000000,
+      "notes": "Initial release with three-way confirmation workflow (Scanner, Reviewer, QA) and Google Core Team personas"
+    }
+  ]
+}
