@@ -24,7 +24,7 @@ skill-name/
 
 `SKILL.md` is the primary artifact — it contains the complete phase-by-phase workflow that Claude Code executes when the skill is invoked. Think of it as the skill's implementation.
 
-### The Five Skills
+### Skills
 
 | Skill | Slash Command | Purpose |
 |-------|--------------|---------|
@@ -33,6 +33,7 @@ skill-name/
 | **spec-to-tasks** | `/spec-to-tasks` | Converts spec documents (Markdown/Word) into structured TODO task plans |
 | **code-diagnosis** | `/code-diagnosis` | Multi-agent code scanning with three-way confirmation (Scanner → Reviewer → QA) |
 | **bug-diagnosis** | `/bug-diagnosis` | Hypothesis-driven bug diagnosis with dual-mode (semi-auto/full-auto) operation |
+| **security-scan** | `/security-scan` | Multi-phase security vulnerability scanning with team personas, verification rounds, and PoC validation |
 
 ### Shared Design Patterns
 
@@ -41,9 +42,11 @@ All skills share these architectural patterns:
 - **Phase-based workflows**: Each skill progresses through numbered phases with clear gates
 - **Language selection first**: Users choose English or Chinese at skill start; all generated content follows that choice
 - **AskUserQuestion for decisions**: Structured questions with candidate answers at critical decision points
-- **Standard tools only**: Skills use only Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, Skill, and Task (for subagent spawning) — no external dependencies
+- **Standard tools only**: Skills use only Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, Skill, and Task/TeamCreate/SendMessage (for multi-agent workflows) — no external dependencies
 - **Search before read**: Use Glob/Grep to locate files before reading them
 - **Edit over Write**: Use Edit for existing files, Write only for new files
+- **Project index awareness**: bug-diagnosis and security-scan check for `.claude-index/` and `CLAUDE.md`, optionally invoking project-indexer first
+- **Multi-agent pipelines**: code-diagnosis (Scanner → Reviewer → QA) and security-scan (Discovery → Verification → Validation) spawn parallel subagent teams via Task/TeamCreate
 
 ### Output Locations
 
@@ -51,6 +54,7 @@ All skills share these architectural patterns:
 - **planning-with-discovery** → `docs/plans/<topic-name>/` (master plan, specs, optional TODOs)
 - **spec-to-tasks** → `docs/plans/<topic-name>/TODO-*.md` files
 - **code-diagnosis** → `docs/scan-report/` structured diagnostic reports
+- **security-scan** → `docs/security-scan/` with phase subdirectories (`phase1/`, `phase2/`, `phase3/`, plus index)
 - **bug-diagnosis** → `.claude/diagnoses/` summaries in target project
 
 ## Working in This Repo
@@ -67,12 +71,15 @@ There are no build, lint, or test commands. Changes are validated by:
 1. Create a directory: `skill-name/`
 2. Write `SKILL.md` following the phase-based workflow pattern used by existing skills
 3. Add `README.md` for user documentation and `_meta.json` for metadata
-4. Update the root `README.md` (both English and `README.zh.md`) to list the new skill
-5. Add trigger phrases in the README and ensure the SKILL.md defines clear activation conditions
+4. Optionally add `references/` for supporting documents (see security-scan for example)
+5. Update the root `README.md` (both English and `README.zh.md`) to list the new skill
+6. Update this `CLAUDE.md` — add the skill to the table, output locations, and any new `.gitignore` entries
+7. Add trigger phrases in the README and ensure the SKILL.md defines clear activation conditions
 
 ### Conventions
 
 - Skill directory names use kebab-case
 - SKILL.md files define `name:` and `description:` in a YAML-like frontmatter block
-- Generated output paths use `docs/plans/` for planning artifacts
-- The `.gitignore` excludes `docs/plans/bug-diagnosis/` to avoid committing diagnosis traces
+- Generated output paths use `docs/plans/` for planning artifacts, `docs/scan-report/` for diagnostics, `docs/security-scan/` for security reports
+- The `.gitignore` excludes `docs/plans/bug-diagnosis/`, `docs/scan-report/`, and `docs/scan-report-*/` to avoid committing generated reports
+- Skills with multi-agent workflows (code-diagnosis, security-scan) use structured agent personas with named identities and role-specific prompts

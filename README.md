@@ -168,6 +168,40 @@ Systematic bug diagnosis and fixing through structured problem analysis and veri
 /bug-diagnosis
 ```
 
+### 🔒 Security Scan
+
+Multi-agent security vulnerability scanning with verification rounds and PoC validation.
+
+**Key Features:**
+- Three-phase pipeline: Discovery → Verification → Validation
+- Configurable team personas (Google Security, Microsoft MSRC, Meta Red Team, Apple SEAR)
+- Multi-round cross-verification to eliminate false positives
+- PoC exploit coding or analysis documentation for confirmed vulnerabilities
+- CVSS v3.1 severity scoring and 0-day vulnerability tracking
+- Project index awareness (auto-detects CLAUDE.md and .claude-index/)
+- Multi-language support (English/Chinese)
+
+**Use Cases:**
+- Comprehensive security audits of codebases
+- 0-day vulnerability discovery and verification
+- Generating proof-of-concept exploits for confirmed vulnerabilities
+- Pre-release security health checks
+- Multi-agent security research
+
+[📖 Read More](./security-scan/SKILL.md)
+
+**Trigger Phrases:**
+```
+"security scan"
+"vulnerability scan"
+"security audit"
+"安全扫描"
+"漏洞扫描"
+/security-scan
+```
+
+---
+
 ## Installation
 
 ### Manual Installation
@@ -185,6 +219,7 @@ cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
 cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
 cp -r JR-Development-Skills/code-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
+cp -r JR-Development-Skills/security-scan ~/.claude/skills/
 ```
 
 3. Restart Claude Code or reload skills (if applicable)
@@ -210,6 +245,10 @@ or
 or
 ```
 /bug-diagnosis
+```
+or
+```
+/security-scan
 ```
 
 If the skill activates, installation was successful.
@@ -279,10 +318,19 @@ JR-Development-Skills/
 │   ├── SKILL.md                       # Skill implementation guide
 │   ├── README.md                      # User documentation
 │   └── _meta.json                     # Skill metadata
-└── bug-diagnosis/                     # Bug diagnosis skill
+├── bug-diagnosis/                     # Bug diagnosis skill
+│   ├── SKILL.md                       # Skill implementation guide
+│   ├── README.md                      # User documentation
+│   └── _meta.json                     # Skill metadata
+└── security-scan/                     # Security vulnerability scanning skill
     ├── SKILL.md                       # Skill implementation guide
-    ├── README.md                      # User documentation
-    └── _meta.json                     # Skill metadata
+    ├── _meta.json                     # Skill metadata
+    └── references/                    # Phase reference documents
+        ├── phase1-discovery.md
+        ├── phase2-verification.md
+        ├── phase3-validation.md
+        ├── report-templates.md
+        └── vulnerability-categories.md
 ```
 
 ## Requirements
@@ -305,6 +353,7 @@ Future skills under consideration:
 
 - [x] **Bug Diagnosis** - Systematic bug finding and fixing ✓ Added
 - [x] **Code Diagnosis** - Multi-agent code scanning with three-way confirmation ✓ Added
+- [x] **Security Scan** - Multi-agent security vulnerability scanning with PoC validation ✓ Added
 - [ ] **Code Review Assistant** - Automated code quality checks
 - [ ] **Test Generation** - Auto-generate test cases from specifications
 - [ ] **Documentation Generator** - Create API docs from code

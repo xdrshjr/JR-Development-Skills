@@ -169,6 +169,41 @@ JR Development Skills 是一个专门的 Claude Code 技能集合，旨在增强
 /bug-diagnosis
 ```
 
+### 🔒 安全扫描 (Security Scan)
+
+多 Agent 安全漏洞扫描，含验证轮次和 PoC 验证。
+
+**核心功能：**
+- 三阶段流水线：发现 → 验证 → 确认
+- 可配置团队身份（Google Security、Microsoft MSRC、Meta Red Team、Apple SEAR）
+- 多轮交叉验证消除误报
+- 为确认漏洞编写 PoC 利用代码或分析文档
+- CVSS v3.1 严重性评分和 0-day 漏洞追踪
+- 项目索引感知（自动检测 CLAUDE.md 和 .claude-index/）
+- 双语支持（英文/中文）
+
+**使用场景：**
+- 代码库全面安全审计
+- 0-day 漏洞发现与验证
+- 为确认漏洞生成概念验证利用
+- 发布前安全健康检查
+- 多 Agent 安全研究
+
+[📖 了解更多](./security-scan/SKILL.md)
+
+**触发短语：**
+```
+"security scan"
+"vulnerability scan"
+"安全扫描"
+"漏洞扫描"
+"漏洞挖掘"
+"安全审计"
+/security-scan
+```
+
+---
+
 ## 安装
 
 ### 手动安装
@@ -186,6 +221,7 @@ cp -r JR-Development-Skills/planning-with-discovery ~/.claude/skills/
 cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
 cp -r JR-Development-Skills/code-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
+cp -r JR-Development-Skills/security-scan ~/.claude/skills/
 ```
 
 3. 重启 Claude Code 或重新加载技能（如果适用）
@@ -211,6 +247,10 @@ cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 或
 ```
 /bug-diagnosis
+```
+或
+```
+/security-scan
 ```
 
 如果技能被激活，则安装成功。
@@ -280,10 +320,19 @@ JR-Development-Skills/
 │   ├── SKILL.md                       # 技能实现指南
 │   ├── README.md                      # 用户文档
 │   └── _meta.json                     # 技能元数据
-└── bug-diagnosis/                     # Bug 诊断技能
+├── bug-diagnosis/                     # Bug 诊断技能
+│   ├── SKILL.md                       # 技能实现指南
+│   ├── README.md                      # 用户文档
+│   └── _meta.json                     # 技能元数据
+└── security-scan/                     # 安全漏洞扫描技能
     ├── SKILL.md                       # 技能实现指南
-    ├── README.md                      # 用户文档
-    └── _meta.json                     # 技能元数据
+    ├── _meta.json                     # 技能元数据
+    └── references/                    # 阶段参考文档
+        ├── phase1-discovery.md
+        ├── phase2-verification.md
+        ├── phase3-validation.md
+        ├── report-templates.md
+        └── vulnerability-categories.md
 ```
 
 ## 系统要求
@@ -306,6 +355,7 @@ JR-Development-Skills/
 
 - [x] **Bug 诊断** - 系统化的 Bug 查找和修复 ✓ 已添加
 - [x] **代码诊断** - 多 Agent 代码扫描与三权分立确认 ✓ 已添加
+- [x] **安全扫描** - 多 Agent 安全漏洞扫描与 PoC 验证 ✓ 已添加
 - [ ] **代码审查助手** - 自动代码质量检查
 - [ ] **测试生成器** - 从规范自动生成测试用例
 - [ ] **文档生成器** - 从代码创建 API 文档
