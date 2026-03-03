@@ -1,0 +1,20 @@
+{
+  "owner": "JR-Agent-Skills",
+  "slug": "security-scan",
+  "displayName": "Security Scan",
+  "description": "Multi-agent security vulnerability scanning, verification, and PoC validation pipeline with configurable team identity, report language, and domain focus",
+  "version": "1.0.0",
+  "tags": ["security", "vulnerability", "scanning", "multi-agent", "audit", "0-day", "penetration-testing", "code-review"],
+  "license": "MIT",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1741046400000
+  },
+  "history": [
+    {
+      "version": "1.0.0",
+      "publishedAt": 1741046400000,
+      "notes": "Initial release with three-phase pipeline (Discovery, Verification, Validation), configurable team identity and report language"
+    }
+  ]
+}
