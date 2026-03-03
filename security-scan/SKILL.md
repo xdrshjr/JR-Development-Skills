@@ -13,6 +13,30 @@ Three-phase security audit pipeline using agent teams. Each phase builds on the 
 2. **Verification** — Two-round cross-verification of discovered vulnerabilities
 3. **Validation** — PoC coding or analysis documentation for confirmed vulnerabilities
 
+## Pre-flight: Project Index Check
+
+Before collecting configuration, check whether the target project has proper context files:
+
+1. Use `Glob` to check if `{project_path}/CLAUDE.md` exists
+2. Use `Glob` to check if `{project_path}/.claude-index/` directory exists
+
+**If both exist** → Proceed to Quick Start. These files provide critical project context that agents will use during scanning.
+
+**If either is missing** → Use `AskUserQuestion`:
+```
+question: "项目缺少索引文件，是否先生成？ / Project is missing index files. Generate them first?"
+header: "Index"
+options:
+  - label: "Yes, generate with project-indexer (Recommended)"
+    description: "使用 project-indexer skill 生成 CLAUDE.md 和 .claude-index，帮助扫描Agent更好地理解项目结构"
+  - label: "Skip, scan without index"
+    description: "跳过索引生成，直接开始扫描（Agent对项目理解可能不够全面）"
+```
+
+If user chooses to generate:
+1. Invoke the `project-indexer` skill on the target project to create `CLAUDE.md` and `.claude-index/`
+2. Wait for completion, then proceed to Quick Start
+
 ## Quick Start
 
 Before any scanning, use `AskUserQuestion` to collect configuration. Ask these in **one call** (up to 4 questions):
@@ -212,6 +236,14 @@ Agent tool call:
     Target project: {project_path}
     Output your report to: {output_path}
     Report language: {report_language}
+
+    ## IMPORTANT: Project Context Files
+    Before starting your scan, read these files to understand the project:
+    1. Read `{project_path}/CLAUDE.md` — project overview, architecture, conventions
+    2. Browse `{project_path}/.claude-index/` — code index with module structure, symbols, dependencies
+    These files give you a map of the codebase. Use them to quickly locate relevant
+    code areas for your scan domain instead of blindly searching.
+
     {phase-specific instructions from references}
 ```
 

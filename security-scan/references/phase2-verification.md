@@ -34,6 +34,13 @@ You may also read detail reports in phase1-discovery/detail-reports/ as needed.
 Verify these specific vulnerabilities: {vuln_id_list}
 Target project: {project_path}
 
+## Project Context
+
+Before starting verification, read project context files to understand the codebase:
+- `{project_path}/CLAUDE.md` — project overview, architecture, key conventions
+- Browse `{project_path}/.claude-index/` — code index with module structure, symbols, dependencies
+Use these to quickly navigate to relevant code areas when verifying each vulnerability.
+
 ## Verification Process
 
 For EACH assigned vulnerability:

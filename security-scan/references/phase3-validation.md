@@ -50,6 +50,12 @@ Vulnerability: {vuln_id} — {vuln_name}
 Details in: {report_dir}/phase2-verification/verification-final-report.md
 Target project: {project_path}
 
+## Project Context
+
+Before writing the PoC, read project context files:
+- `{project_path}/CLAUDE.md` — project overview, architecture, key conventions
+- Browse `{project_path}/.claude-index/` — code index with module structure, symbols, dependencies
+
 ## Process
 
 1. Understand the vulnerability deeply — read the code, trace the path
@@ -117,6 +123,12 @@ professional yet accessible.
 
 Vulnerability: {vuln_id} — {vuln_name}
 Target project: {project_path}
+
+## Project Context
+
+Before writing the analysis, read project context files:
+- `{project_path}/CLAUDE.md` — project overview, architecture, key conventions
+- Browse `{project_path}/.claude-index/` — code index with module structure, symbols, dependencies
 
 ## Output Directory
 

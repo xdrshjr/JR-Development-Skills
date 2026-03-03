@@ -32,14 +32,18 @@ Target project: {project_path}
 
 ## Process
 
-1. Read the project structure — understand the codebase layout, build system, dependencies
-2. Identify attack surfaces relevant to your scan domain
-3. For each potential vulnerability found:
+1. Read project context files first:
+   - `{project_path}/CLAUDE.md` — project overview, architecture, key conventions
+   - Browse `{project_path}/.claude-index/` — code index with module structure, symbols, dependencies
+   Use these to build a mental map of the codebase before scanning.
+2. Based on the index, identify code areas and modules relevant to your scan domain
+3. Identify attack surfaces relevant to your scan domain
+4. For each potential vulnerability found:
    a. Trace the code path to confirm reachability
    b. Check for existing mitigations
    c. Assess severity (CVSS v3.1)
    d. Determine if it could be a 0-day (check against known CVEs)
-4. Write your report
+5. Write your report
 
 ## Output
 
