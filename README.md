@@ -168,6 +168,8 @@ Systematic bug diagnosis and fixing through structured problem analysis and veri
 /bug-diagnosis
 ```
 
+---
+
 ### 🔒 Security Scan
 
 Multi-agent security vulnerability scanning with verification rounds and PoC validation.
@@ -202,6 +204,38 @@ Multi-agent security vulnerability scanning with verification rounds and PoC val
 
 ---
 
+### 🎨 Nano Banana Draw
+
+AI-powered image generation and editing using Google's Gemini 3 Pro Image API.
+
+**Key Features:**
+- Text-to-image generation from natural language descriptions
+- Image editing with text instructions on existing images
+- Multi-resolution output: 1K (fast), 2K (balanced), 4K (maximum quality)
+- Auto API key detection (argument → .env → environment variable)
+- Timestamped output filenames
+
+**Use Cases:**
+- Generating concept art and illustrations
+- Creating visual assets for projects
+- Editing and transforming existing images
+- Quick visual prototyping
+
+[📖 Read More](./nano-banana-draw/README.md)
+
+**Trigger Phrases:**
+```
+"generate an image"
+"draw something"
+"create a picture"
+"edit this image"
+"生成图片"
+"画图"
+/nano-banana-draw
+```
+
+---
+
 ## Installation
 
 ### Manual Installation
@@ -220,6 +254,7 @@ cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
 cp -r JR-Development-Skills/code-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/security-scan ~/.claude/skills/
+cp -r JR-Development-Skills/nano-banana-draw ~/.claude/skills/
 ```
 
 3. Restart Claude Code or reload skills (if applicable)
@@ -249,6 +284,10 @@ or
 or
 ```
 /security-scan
+```
+or
+```
+/nano-banana-draw
 ```
 
 If the skill activates, installation was successful.
@@ -322,15 +361,21 @@ JR-Development-Skills/
 │   ├── SKILL.md                       # Skill implementation guide
 │   ├── README.md                      # User documentation
 │   └── _meta.json                     # Skill metadata
-└── security-scan/                     # Security vulnerability scanning skill
+├── security-scan/                     # Security vulnerability scanning skill
+│   ├── SKILL.md                       # Skill implementation guide
+│   ├── _meta.json                     # Skill metadata
+│   └── references/                    # Phase reference documents
+│       ├── phase1-discovery.md
+│       ├── phase2-verification.md
+│       ├── phase3-validation.md
+│       ├── report-templates.md
+│       └── vulnerability-categories.md
+└── nano-banana-draw/                  # AI image generation & editing skill
     ├── SKILL.md                       # Skill implementation guide
+    ├── README.md                      # User documentation
     ├── _meta.json                     # Skill metadata
-    └── references/                    # Phase reference documents
-        ├── phase1-discovery.md
-        ├── phase2-verification.md
-        ├── phase3-validation.md
-        ├── report-templates.md
-        └── vulnerability-categories.md
+    └── scripts/
+        └── generate_image.py          # Image generation script (runs via uv)
 ```
 
 ## Requirements

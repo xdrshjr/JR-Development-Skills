@@ -34,6 +34,7 @@ skill-name/
 | **code-diagnosis** | `/code-diagnosis` | Multi-agent code scanning with three-way confirmation (Scanner → Reviewer → QA) |
 | **bug-diagnosis** | `/bug-diagnosis` | Hypothesis-driven bug diagnosis with dual-mode (semi-auto/full-auto) operation |
 | **security-scan** | `/security-scan` | Multi-phase security vulnerability scanning with team personas, verification rounds, and PoC validation |
+| **nano-banana-draw** | `/nano-banana-draw` | AI image generation & editing using Gemini 3 Pro Image (text-to-image, image editing, multi-resolution) |
 
 ### Shared Design Patterns
 
@@ -56,6 +57,7 @@ All skills share these architectural patterns:
 - **code-diagnosis** → `docs/scan-report/` structured diagnostic reports
 - **security-scan** → `docs/security-scan/` with phase subdirectories (`phase1/`, `phase2/`, `phase3/`, plus index)
 - **bug-diagnosis** → `.claude/diagnoses/` summaries in target project
+- **nano-banana-draw** → `img/` directory in user's working directory (timestamped PNG files)
 
 ## Working in This Repo
 

@@ -2,3 +2,6 @@
 docs/plans/bug-diagnosis/
 docs/scan-report/
 docs/scan-report-*/
+
+# Generated images from nano-banana-draw
+img/

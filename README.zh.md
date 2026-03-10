@@ -204,6 +204,38 @@ JR Development Skills 是一个专门的 Claude Code 技能集合，旨在增强
 
 ---
 
+### 🎨 AI 绘图 (Nano Banana Draw)
+
+基于 Google Gemini 3 Pro Image API 的 AI 图片生成与编辑技能。
+
+**核心功能：**
+- 通过自然语言描述生成图片（文生图）
+- 基于文字指令编辑已有图片（图生图）
+- 多分辨率输出：1K（快速）、2K（均衡）、4K（最高质量）
+- 自动 API Key 检测（参数 → .env 文件 → 环境变量）
+- 时间戳命名输出文件
+
+**使用场景：**
+- 生成概念艺术和插图
+- 为项目创建视觉素材
+- 编辑和变换已有图片
+- 快速视觉原型设计
+
+[📖 了解更多](./nano-banana-draw/README.md)
+
+**触发短语：**
+```
+"generate an image"
+"draw something"
+"生成图片"
+"画图"
+"绘图"
+"修图"
+/nano-banana-draw
+```
+
+---
+
 ## 安装
 
 ### 手动安装
@@ -222,6 +254,7 @@ cp -r JR-Development-Skills/spec-to-tasks ~/.claude/skills/
 cp -r JR-Development-Skills/code-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/bug-diagnosis ~/.claude/skills/
 cp -r JR-Development-Skills/security-scan ~/.claude/skills/
+cp -r JR-Development-Skills/nano-banana-draw ~/.claude/skills/
 ```
 
 3. 重启 Claude Code 或重新加载技能（如果适用）
@@ -251,6 +284,10 @@ cp -r JR-Development-Skills/security-scan ~/.claude/skills/
 或
 ```
 /security-scan
+```
+或
+```
+/nano-banana-draw
 ```
 
 如果技能被激活，则安装成功。
@@ -324,15 +361,21 @@ JR-Development-Skills/
 │   ├── SKILL.md                       # 技能实现指南
 │   ├── README.md                      # 用户文档
 │   └── _meta.json                     # 技能元数据
-└── security-scan/                     # 安全漏洞扫描技能
+├── security-scan/                     # 安全漏洞扫描技能
+│   ├── SKILL.md                       # 技能实现指南
+│   ├── _meta.json                     # 技能元数据
+│   └── references/                    # 阶段参考文档
+│       ├── phase1-discovery.md
+│       ├── phase2-verification.md
+│       ├── phase3-validation.md
+│       ├── report-templates.md
+│       └── vulnerability-categories.md
+└── nano-banana-draw/                  # AI 图片生成与编辑技能
     ├── SKILL.md                       # 技能实现指南
+    ├── README.md                      # 用户文档
     ├── _meta.json                     # 技能元数据
-    └── references/                    # 阶段参考文档
-        ├── phase1-discovery.md
-        ├── phase2-verification.md
-        ├── phase3-validation.md
-        ├── report-templates.md
-        └── vulnerability-categories.md
+    └── scripts/
+        └── generate_image.py          # 图片生成脚本（通过 uv 运行）
 ```
 
 ## 系统要求
