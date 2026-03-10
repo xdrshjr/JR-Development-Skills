@@ -2,7 +2,7 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
-#     "google-genai>=1.0.0",
+#     "google-genai>=1.65.0",
 #     "pillow>=10.0.0",
 # ]
 # ///
@@ -148,7 +148,15 @@ def main():
         )
 
         image_saved = False
-        for part in response.parts:
+        # Handle different response structures across google-genai versions
+        parts = getattr(response, 'parts', None)
+        if parts is None:
+            # Fallback: some versions use response.candidates[0].content.parts
+            try:
+                parts = response.candidates[0].content.parts
+            except (AttributeError, IndexError):
+                parts = []
+        for part in parts:
             if part.text is not None:
                 print(f"Model response: {part.text}")
             elif part.inline_data is not None:

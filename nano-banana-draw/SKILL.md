@@ -205,6 +205,20 @@ Note: `{output_path}` should be an **absolute path** (e.g., `/home/user/project/
 - Run from the user's working directory, not the skill directory
 - Do NOT pass `--input-image` when generating new images
 
+**If `uv run` fails** (e.g., dependency installation errors on Windows like `rsa` package failure):
+
+Fall back to manual pip install + python execution:
+```bash
+pip install "google-genai>=1.65.0" pillow
+```
+Then run with `python` directly:
+```bash
+python {skill_path}/scripts/generate_image.py \
+  --prompt "{refined_prompt}" \
+  --filename "{output_path}" \
+  --resolution {resolution}
+```
+
 #### Step 3: Verify Output
 
 After the script completes:
@@ -247,7 +261,18 @@ The generation script is bundled with this skill at:
 nano-banana-draw/scripts/generate_image.py
 ```
 
-It requires `uv` to run (auto-installs dependencies: `google-genai`, `pillow`).
+It requires `uv` to run (auto-installs dependencies: `google-genai>=1.65.0`, `pillow`).
+
+If `uv` is unavailable or fails, install dependencies manually with `pip install "google-genai>=1.65.0" pillow` and run with `python` directly.
+
+## Troubleshooting
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `module 'google.genai.types' has no attribute 'ImageConfig'` | `google-genai` version too old (< 1.65.0) | Run `pip install --upgrade google-genai` to upgrade to >= 1.65.0 |
+| `'GenerateContentResponse' object has no attribute 'parts'` | Older SDK version with different response structure | Upgrade `google-genai` to >= 1.65.0; the script includes a fallback for `response.candidates[0].content.parts` |
+| `uv run` fails with `rsa` or other package install errors on Windows | `uv` has trouble installing certain packages on Windows | Use `pip install "google-genai>=1.65.0" pillow` then run with `python` instead of `uv run` |
+| `404 NOT_FOUND` for model name | Model ID is incorrect or not available for your API version | Ensure you are using model `gemini-3-pro-image-preview` (not other variants); check available models with `client.models.list()` |
 
 ## Constraints
 

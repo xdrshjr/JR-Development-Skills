@@ -73,4 +73,24 @@ uv run scripts/generate_image.py --prompt "mountain landscape" --filename "img/m
 ## Requirements
 
 - `uv` (Python package runner — auto-installs dependencies)
+- `google-genai` >= 1.65.0 (required for `types.ImageConfig` support)
+- `pillow` >= 10.0.0
 - Google Gemini API key with image generation access
+
+### If `uv run` fails on Windows
+
+Some Windows environments have issues with `uv` installing certain packages (e.g., `rsa`). In that case, install dependencies manually and use `python` directly:
+
+```bash
+pip install "google-genai>=1.65.0" pillow
+python scripts/generate_image.py --prompt "your prompt" --filename "output.png"
+```
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `has no attribute 'ImageConfig'` | Upgrade: `pip install --upgrade google-genai` (need >= 1.65.0) |
+| `'GenerateContentResponse' object has no attribute 'parts'` | Upgrade `google-genai` to >= 1.65.0 |
+| `uv run` fails with package install errors on Windows | Use `pip install` + `python` instead (see above) |
+| `404 NOT_FOUND` model error | Ensure model is `gemini-3-pro-image-preview`; verify with API |
