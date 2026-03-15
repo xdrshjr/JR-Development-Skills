@@ -51,8 +51,8 @@ digraph when_to_use {
 | 2.4 | TODOs | `todos/01-*.md` with dependency metadata | Batch approved |
 | 2.5 | Orchestration | `task-orchestration.md` | User approves |
 | 3 | Decision | Start development? | User chooses |
-| 4 | Team Assembly | Team profile + agent briefs | User approves |
-| 5 | Dev + Review | Code + per-agent code review | Phase-gated |
+| 4 | Team Assembly | Team profile + subagent briefs → spawn via `Agent` tool | User approves |
+| 5 | Dev + Review | Subagents code → auto-spawn review subagents → fix issues | Phase-gated, auto |
 
 **Output directory:** `docs/plans/<topic-name>/` — contains `master-plan.md`, `task-orchestration.md`, `specs/*.md`, and optionally `todos/*.md`. Phase 4-5 generates source code in the project's own directories outside `docs/plans/`.
 
@@ -183,65 +183,91 @@ Present summary of all generated files, then ask via `AskUserQuestion`:
 - Option 3: `"Not now, I'll start development later"`
 - Option 4: `"I want to revisit some parts of the plan first"`
 
-## Phase 4: Development Team Assembly
+## Phase 4: Development Team Assembly — Launching Subagents
+
+This phase spawns real subagents (via the `Agent` tool) to form a development team. Each subagent is an independent coding agent that reads planning docs, writes code, and reports back.
 
 ### 4.1: Team Role Selection
 
-Ask via `AskUserQuestion` — see [team-profiles.md](team-profiles.md) for full persona details:
+**This step is mandatory.** Before any subagent is created, the user MUST choose a team profile. Ask via `AskUserQuestion` — see [team-profiles.md](team-profiles.md) for full persona details and prompt prefixes:
 
 - Option 1: **`"Google Core Engineering Team"`** (Default) — scalable systems, clean architecture, testing culture
 - Option 2: **`"DeepMind AI/ML Engineering Team"`** — ML pipelines, algorithm design, research-to-prod
 - Option 3: **`"Meta Infrastructure & Product Team"`** — distributed systems, React, rapid iteration
 - Option 4: **`"Stripe Developer Platform Team"`** — API excellence, security-first, bulletproof error handling
 
-"Other" → user provides custom team persona (used verbatim).
+"Other" → user provides custom team persona (used verbatim). The selected profile determines the persona prompt injected into every subagent in Phase 4-5.
 
-### 4.2: Team Composition
+### 4.2: Team Composition & Assignment Plan
 
-Analyze `task-orchestration.md` Section 4. For each agent, prepare an assignment brief — see [orchestration-guide.md](orchestration-guide.md) for the brief template. Brief includes: identity, assigned tasks, dependencies, parallel peers, required reading, coordination notes, completion criteria.
+Analyze `task-orchestration.md` Section 4. For each subagent, prepare an assignment brief — see [orchestration-guide.md](orchestration-guide.md) for the brief template. Brief includes: identity, assigned tasks, dependencies, parallel peers, required reading, coordination notes, completion criteria.
 
-Present team composition → user approves.
+Present the full team composition (number of subagents, names, task mapping, execution phases) → user approves before any subagent is launched.
 
-### 4.3: Launch Development Team
+### 4.3: Launch Development Subagents
 
-Create agents via `TeamCreate` / `TaskCreate` following execution phases:
+**Use the `Agent` tool to spawn each development subagent.** Each subagent runs independently and writes real code.
 
-- **Phase 1 agents launch in parallel** (no dependencies)
-- **Phase 2+ agents wait** until dependencies complete AND pass code review
+**Launching rules:**
+- **Execution Phase 1 subagents**: Launch ALL in parallel using multiple `Agent` tool calls in a single message (they have no dependencies)
+- **Execution Phase 2+ subagents**: Launch ONLY after all their dependency tasks from previous phases have completed AND passed code review (Phase 5.1)
+- Set `run_in_background: true` for parallel subagents so they execute concurrently
 
-Each agent prompt MUST include — see [orchestration-guide.md](orchestration-guide.md) for the full template:
-- Team persona description
-- Instructions to READ all planning docs before coding
+**Each subagent prompt MUST include** — see [orchestration-guide.md](orchestration-guide.md) for the full template:
+- The team persona description from Step 4.1 (e.g., "You are a senior Google engineer...")
+- Explicit instruction: **"BEFORE writing any code, use the Read tool to read ALL of these planning documents:"** followed by the full file path list
 - Specific task assignment and completion criteria
-- Dependency info
-- **"Do NOT mark task done. Report completion and wait for code review."**
+- Dependency info: what was already completed, what depends on this subagent's output
+- **"When you finish, report what files you created/modified and what you implemented. Do NOT consider your work final — a code review subagent will review and fix issues."**
 
-Monitor progress. Launch next-phase agents as dependencies are satisfied. Report to user at each phase transition.
+**Monitoring:**
+- Track which subagents have completed via their return messages
+- When all subagents in an execution phase complete → trigger Phase 5.1 code review for each
+- Report progress to the user at each phase transition
+- Launch next-phase subagents only after current phase is fully reviewed
 
-**On agent failure:** Ask user — retry / reassign / skip / abort. See [orchestration-guide.md](orchestration-guide.md) for error handling details.
+**On subagent failure:** Ask user via `AskUserQuestion` — retry / reassign / skip / abort. See [orchestration-guide.md](orchestration-guide.md) for details.
 
-## Phase 5: Code Review & Quality Assurance
+## Phase 5: Automated Code Review & Quality Assurance
 
-### 5.1: Per-Agent Code Review
+**Code review is fully automated — no user action needed.** The orchestrator automatically spawns review subagents after each dev subagent completes.
 
-When a dev agent reports completion, launch a **Code Review agent** (same team persona). Review checklist:
+### 5.1: Per-Agent Code Review (Auto-triggered)
 
-- **Correctness:** Implementation matches spec
-- **Code quality:** Clean code, proper naming, no smells
-- **Security:** No OWASP top 10 vulnerabilities introduced
-- **Testing:** Adequate and meaningful tests
-- **Integration:** Compatible with other agents' code
-- **TODO compliance:** All checklist items addressed
+**Immediately** when a development subagent reports completion, **automatically** spawn a Code Review subagent using the `Agent` tool:
+
+```
+Agent(
+  description: "Code review for {agent-name}",
+  prompt: {review prompt from orchestration-guide.md Code Review Agent Template},
+  mode: "auto"
+)
+```
+
+The review subagent:
+1. Reads ALL planning documents (master plan, specs, TODOs, orchestration file)
+2. Reads all files created/modified by the dev subagent
+3. Reviews against this checklist:
+   - **Correctness:** Implementation matches spec
+   - **Code quality:** Clean code, proper naming, no smells
+   - **Security:** No OWASP top 10 vulnerabilities introduced
+   - **Testing:** Adequate and meaningful tests
+   - **Integration:** Compatible with other agents' code
+   - **TODO compliance:** All checklist items addressed
+4. **If issues found → fixes them directly** (edits the code), then reports what was changed and why
+5. **If no issues → confirms pass**
 
 See [orchestration-guide.md](orchestration-guide.md) for the full review prompt template.
 
-Issues found → fix directly. No issues → confirm pass. Only then mark task DONE.
+**This happens automatically for EVERY dev subagent** — do NOT wait for user input, do NOT skip, do NOT ask whether to review. The review subagent is always spawned.
 
 ### 5.2: Integration Verification
 
-After ALL agents in a phase pass review: run test suites. Failures → identify cause → launch fix agent → re-review → re-test.
+After ALL subagents in an execution phase have completed AND their review subagents have confirmed pass:
 
-Report phase status to user before launching next phase.
+1. Run available test suites via `Bash` (`npm test`, `pytest`, `go test`, etc.)
+2. If tests fail → automatically spawn a fix subagent (same team persona) with the test output → re-review → re-test
+3. Report phase status to user before launching next-phase subagents
 
 ### 5.3: Final Completion
 
@@ -265,10 +291,12 @@ After all phases complete, present summary (tasks, reviews, tests, files modifie
 | Generic/overlapping candidate answers | Span a spectrum of distinct, specific options |
 | Full TODO files missing dependency annotations | Include `depends_on`, `blocks`, `parallel_group` unless user chose lightweight |
 | Skipping orchestration file | Always generate `task-orchestration.md` |
-| Launching dev agents without user approval | User must approve team composition first |
+| Launching dev subagents without user approval | User must approve team composition in Step 4.2 first |
 | Launching Phase N+1 before Phase N passes review | Phase-gated: complete + reviewed + tested |
-| Dev agents skip reading planning docs | ALL planning docs required reading before coding |
-| Marking task done without code review | Code review agent must confirm first |
+| Dev subagents skip reading planning docs | ALL planning docs required reading before coding |
+| Waiting for user input before code review | Code review subagents are AUTO-spawned, no user action |
+| Not using `Agent` tool to spawn subagents | Phase 4-5 MUST use `Agent` tool, not just describe tasks |
+| Skipping team selection (Step 4.1) | ALWAYS ask user to choose team profile before spawning |
 | Starting development without user consent | User explicitly chooses in Phase 3 |
 
 ## Required Tools
@@ -277,6 +305,6 @@ After all phases complete, present summary (tasks, reviews, tests, files modifie
 - `Glob`, `Grep` — project exploration
 - `AskUserQuestion` — structured choices (4 options, tool adds 5th "Other")
 - `Bash` — creating directories, running test suites
-- `TeamCreate`, `TaskCreate`, `SendMessage` — multi-agent workflows (Phase 4-5)
+- **`Agent`** — spawning development and code review subagents (Phase 4-5). Use `run_in_background: true` for parallel subagents within the same execution phase
 
-Phase 0-2 works in any environment. Phase 4-5 requires multi-agent support.
+Phase 0-2 works in any environment. Phase 4-5 requires the `Agent` tool for subagent spawning.

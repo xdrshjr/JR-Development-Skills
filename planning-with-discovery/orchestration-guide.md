@@ -86,18 +86,24 @@ Focus: {specific spec/TODO files for this agent's tasks}
 
 ---
 
-## Agent Prompt Template
+## Development Subagent Prompt Template
 
-Each agent's prompt in Step 4.3 MUST include:
+Each subagent is spawned via the `Agent` tool in Step 4.3. Use `run_in_background: true` for parallel subagents.
 
-```
-You are {agent name}, a {team persona description}.
+```python
+Agent(
+    description="Dev: {task-summary}",
+    prompt="""
+You are {agent name}, a {team persona description from team-profiles.md}.
 
-BEFORE WRITING ANY CODE, read these planning documents:
+BEFORE WRITING ANY CODE, you MUST use the Read tool to read these planning documents:
 - docs/plans/{topic}/master-plan.md
-- docs/plans/{topic}/specs/*.md
-- docs/plans/{topic}/todos/*.md
 - docs/plans/{topic}/task-orchestration.md
+- docs/plans/{topic}/specs/01-{name}.md
+- docs/plans/{topic}/specs/02-{name}.md
+- ... (all spec files)
+- docs/plans/{topic}/todos/01-{name}.md (if generated)
+- ... (all TODO files)
 
 YOUR ASSIGNMENT:
 {specific tasks from assignment brief}
@@ -111,37 +117,62 @@ COORDINATION:
 {shared interfaces/contracts}
 
 COMPLETION:
-When done, report completion. Do NOT mark task as done.
-A code review agent will review your work first.
+When you finish, report:
+1. List of all files you created or modified
+2. Summary of what you implemented
+3. Any concerns or edge cases you noticed
+
+Do NOT consider your work final. A code review subagent will automatically
+review your code and fix any issues found.
+""",
+    run_in_background=True  # for parallel execution within same phase
+)
 ```
 
 ---
 
-## Code Review Agent Template
+## Code Review Subagent Template
 
-Launched per-agent after task completion (Step 5.1):
+**Auto-triggered** — the orchestrator MUST spawn this subagent immediately when any dev subagent reports completion. No user confirmation needed.
 
-```
-You are a senior code reviewer from {team profile}.
+```python
+Agent(
+    description="Code review for {dev-agent-name}",
+    prompt="""
+You are a senior code reviewer from {team profile, same as the dev team}.
 
-CONTEXT: Read ALL planning documents before reviewing:
+TASK: Review and fix the code written by {dev-agent-name}.
+
+STEP 1 — READ CONTEXT:
+Use the Read tool to read ALL planning documents:
 - docs/plans/{topic}/master-plan.md
-- docs/plans/{topic}/specs/*.md
-- docs/plans/{topic}/todos/*.md
 - docs/plans/{topic}/task-orchestration.md
+- docs/plans/{topic}/specs/*.md (all spec files)
+- docs/plans/{topic}/todos/*.md (all TODO files, if they exist)
 
-REVIEW CHECKLIST:
-- [ ] Correctness: Implementation matches spec
-- [ ] Code quality: Clean code, proper naming, no smells
-- [ ] Security: No OWASP top 10 vulnerabilities
-- [ ] Testing: Adequate and meaningful tests
-- [ ] Integration: Compatible with other agents' code
-- [ ] TODO compliance: All checklist items addressed
+STEP 2 — READ THE CODE:
+Read all files created/modified by the dev agent:
+{list of files from dev agent's completion report}
 
-ACTION:
-- Issues found → Fix directly, report what changed and why
-- No issues → Confirm code passes review
+STEP 3 — REVIEW CHECKLIST:
+Check each item. For every issue found, fix it directly using the Edit tool:
+- [ ] Correctness: Does implementation match the spec?
+- [ ] Code quality: Clean code, proper naming, no code smells?
+- [ ] Security: No OWASP top 10 vulnerabilities introduced?
+- [ ] Testing: Are tests adequate and meaningful?
+- [ ] Integration: Will this work with code from other agents?
+- [ ] TODO compliance: Are all checklist items from the TODO addressed?
+
+STEP 4 — REPORT:
+- If you fixed issues: list every change you made and why
+- If no issues found: confirm the code passes review
+- Rate overall quality: PASS / PASS WITH FIXES / NEEDS REWORK
+""",
+    mode="auto"
+)
 ```
+
+**NEEDS REWORK** means the review subagent found issues too severe to fix inline. In this case, the orchestrator should spawn a new dev subagent to rework the task, then re-trigger code review.
 
 ---
 
@@ -176,16 +207,22 @@ If user skipped TODOs but chose development: warn that TODO generation produces 
 ## Phase-Gated Execution Flow
 
 ```
-Phase 1 agents launch (parallel)
-    ↓ each completes → code review agent
-    ↓ all pass review → integration tests
-    ↓ tests pass
-Phase 2 agents launch (parallel)
-    ↓ same cycle
+Phase 1: Spawn dev subagents (parallel, run_in_background=true)
+    ↓ dev subagent completes
+    ↓ AUTO-SPAWN: code review subagent (no user input needed)
+    ↓ review subagent fixes issues or confirms pass
+    ↓ ALL phase 1 subagents reviewed
+    ↓ Run integration tests (Bash)
+    ↓ Tests pass → report to user
+Phase 2: Spawn next dev subagents (parallel)
+    ↓ same auto-review cycle
     ...
-Phase N agents launch
-    ↓ all pass
-Final summary → user decides next step
+Phase N: Last subagents complete + reviewed + tested
+    ↓
+Final summary → user decides next step (AskUserQuestion)
 ```
 
-Never launch Phase N+1 agents until Phase N is fully complete (all tasks done + reviewed + tests pass).
+**Critical rules:**
+- Never launch Phase N+1 subagents until Phase N is fully complete (all tasks done + reviewed + tests pass)
+- Code review is ALWAYS auto-triggered — never ask user whether to review
+- Each dev subagent gets exactly one review subagent; if review says NEEDS REWORK, spawn a new dev subagent then re-review
