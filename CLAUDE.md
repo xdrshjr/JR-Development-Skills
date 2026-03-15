@@ -29,7 +29,7 @@ skill-name/
 | Skill | Slash Command | Purpose |
 |-------|--------------|---------|
 | **project-indexer** | `/project-indexer` | Scans codebases and generates `.claude-index/` with navigable feature maps |
-| **planning-with-discovery** | `/planning-with-discovery` | Iterative requirements Q&A → specs → optional TODO files |
+| **planning-with-discovery** | `/planning-with-discovery` | Iterative requirements Q&A → specs → dependency-aware TODOs → optional multi-agent development with code review |
 | **spec-to-tasks** | `/spec-to-tasks` | Converts spec documents (Markdown/Word) into structured TODO task plans |
 | **code-diagnosis** | `/code-diagnosis` | Multi-agent code scanning with three-way confirmation (Scanner → Reviewer → QA) |
 | **bug-diagnosis** | `/bug-diagnosis` | Hypothesis-driven bug diagnosis with dual-mode (semi-auto/full-auto) operation |
@@ -47,12 +47,12 @@ All skills share these architectural patterns:
 - **Search before read**: Use Glob/Grep to locate files before reading them
 - **Edit over Write**: Use Edit for existing files, Write only for new files
 - **Project index awareness**: bug-diagnosis and security-scan check for `.claude-index/` and `CLAUDE.md`, optionally invoking project-indexer first
-- **Multi-agent pipelines**: code-diagnosis (Scanner → Reviewer → QA) and security-scan (Discovery → Verification → Validation) spawn parallel subagent teams via Task/TeamCreate
+- **Multi-agent pipelines**: code-diagnosis (Scanner → Reviewer → QA), security-scan (Discovery → Verification → Validation), and planning-with-discovery (Development Team → Code Review, Phase 4-5) spawn parallel subagent teams via Task/TeamCreate
 
 ### Output Locations
 
 - **project-indexer** → `.claude-index/index.md` and `.claude-index/config.md` in target project
-- **planning-with-discovery** → `docs/plans/<topic-name>/` (master plan, specs, optional TODOs)
+- **planning-with-discovery** → `docs/plans/<topic-name>/` (master plan, specs, optional TODOs, task-orchestration.md); Phase 4-5 generates source code in project directories
 - **spec-to-tasks** → `docs/plans/<topic-name>/TODO-*.md` files
 - **code-diagnosis** → `docs/scan-report/` structured diagnostic reports
 - **security-scan** → `docs/security-scan/` with phase subdirectories (`phase1/`, `phase2/`, `phase3/`, plus index)

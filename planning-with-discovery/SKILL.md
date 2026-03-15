@@ -1,209 +1,282 @@
 ---
 name: planning-with-discovery
-description: Use when starting a new project, feature, or task that needs requirements clarification and spec planning before implementation. Also use when the user mentions "plan", "spec", "requirements", "design doc", or wants to discuss what to build before coding.
+description: Structured requirements discovery and spec planning for new projects and features. Use when starting a new project, feature, or task that needs requirements clarification before implementation. Also use when the user mentions "plan", "spec", "requirements", "design doc", "architecture", "scope", "discovery", or wants to discuss what to build before coding.
 ---
 
-# Requirements Discovery & Spec Planning
+# Planning with Discovery
 
 ## Overview
 
-Guide developers through structured requirements discovery via iterative Q&A rounds, then generate a complete spec plan with master plan, detailed design documents, and actionable TODO files - all before any code is written.
+Structured requirements discovery through iterative Q&A, then spec planning with dependency analysis — optionally followed by multi-agent development execution with automated code review.
 
-**Core principle:** Never start coding without a clear, validated plan. Discover requirements through conversation, write specs incrementally with user approval, then produce actionable tasks.
+**Core principle:** Never start coding without a validated plan.
 
 ## When to Use
 
-- Starting a new project or significant feature
-- Requirements are vague, incomplete, or only exist as a rough idea
-- The team needs alignment on what to build before implementation
-- User wants to "think through" a feature before coding
+```dot
+digraph when_to_use {
+    "Start" [shape=doublecircle];
+    "New project or feature?" [shape=diamond];
+    "Requirements clear?" [shape=diamond];
+    "Simple bug fix?" [shape=diamond];
+    "Use this skill" [shape=doublecircle];
+    "Don't use — just code" [shape=box];
+    "Don't use — use bug-diagnosis" [shape=box];
 
-**Do NOT use when:**
-- The task is a simple bug fix or minor tweak
-- Requirements are already fully documented
-- User explicitly says "just do it" for a small, clear task
+    "Start" -> "New project or feature?";
+    "New project or feature?" -> "Requirements clear?" [label="yes"];
+    "New project or feature?" -> "Simple bug fix?" [label="no"];
+    "Requirements clear?" -> "Don't use — just code" [label="yes, fully documented"];
+    "Requirements clear?" -> "Use this skill" [label="no / partial / vague"];
+    "Simple bug fix?" -> "Don't use — use bug-diagnosis" [label="yes"];
+    "Simple bug fix?" -> "Use this skill" [label="no — it's complex"];
+}
+```
 
-## The Process
+- Requirements are vague, incomplete, or just a rough idea
+- Team needs alignment before implementation
+- User says "plan", "spec", "think through", "design doc"
 
-### Phase 0: Initialization
+**Do NOT use:** Simple bug fixes, fully documented requirements, user says "just do it."
 
-1. Read the user's initial task description carefully
-2. Auto-generate a short kebab-case topic name from the description (e.g., `user-auth-system`, `payment-flow`)
-3. Ask the user which language to use for conversation and generated documents:
-   - Present as a simple choice: English or Chinese (or other if user specifies)
-   - The skill prompt itself stays in English; conversation and output files follow user's chosen language
-4. Confirm the output directory: `docs/plans/<topic-name>/`
+## Quick Reference
 
-### Phase 1: Requirements Discovery (Iterative Q&A)
+| Phase | What | Key Output | Gate |
+|-------|------|------------|------|
+| 0 | Initialization | Topic name, language, output dir | — |
+| 1 | Discovery Q&A | 8 questions/round × N rounds | User says "ready" |
+| 2.1 | Master Plan | `master-plan.md` | User approves |
+| 2.2 | Config | Spec count + TODO preference | User chooses |
+| 2.3 | Spec Files | `specs/01-*.md` ... | Each approved sequentially |
+| 2.4 | TODOs | `todos/01-*.md` with dependency metadata | Batch approved |
+| 2.5 | Orchestration | `task-orchestration.md` | User approves |
+| 3 | Decision | Start development? | User chooses |
+| 4 | Team Assembly | Team profile + agent briefs | User approves |
+| 5 | Dev + Review | Code + per-agent code review | Phase-gated |
+
+**Output directory:** `docs/plans/<topic-name>/` — contains `master-plan.md`, `task-orchestration.md`, `specs/*.md`, and optionally `todos/*.md`. Phase 4-5 generates source code in the project's own directories outside `docs/plans/`.
+
+---
+
+## Phase 0: Initialization
+
+1. Read the user's initial task description
+2. Auto-generate a kebab-case topic name (e.g., `user-auth-system`)
+3. Ask language preference: English or Chinese (or other)
+4. Confirm output directory: `docs/plans/<topic-name>/`
+
+## Phase 1: Requirements Discovery
+
+Iterative Q&A rounds until requirements are clear.
 
 **Each round:**
-1. Prepare exactly 8 questions, each with 4 candidate answers
-2. Questions should be driven entirely by the agent's judgment - ask whatever is most important to clarify based on:
-   - The original task description
-   - All previous answers from the user
-   - Gaps, ambiguities, or risks identified so far
-3. Deliver the 8 questions via two `AskUserQuestion` calls (4 questions each)
-   - Each question gets exactly 4 candidate answer options (the tool automatically appends an "Other" option for free-text input, giving 5 total choices per question)
-   - The user selects one candidate per question OR picks "Other" to write a custom response
-4. Digest all answers and update your internal understanding
+1. Prepare exactly **8 questions**, each with **4 candidate answers**
+2. Deliver via **8 `AskUserQuestion` calls** (one per question, each with 4 candidate answers), issued in **two batches of 4** for a natural conversational pace
+   - Tool automatically appends "Other" for free-text (5 total choices per question)
+3. Digest answers, update understanding
 
-**After each round, evaluate readiness:**
-- If enough information has been gathered to write a meaningful spec, ask: "I believe I have enough information to start writing the plan. Ready to proceed, or would you like another round of questions?"
-- If significant gaps remain, proceed directly with another round of 8 questions
-- The user can override at any time by typing keywords like "start writing", "generate plan", "begin spec", "write the plan", or similar - honor this immediately
+**After each round:**
+- Enough info gathered → ask: "Ready to start writing the plan, or another round?"
+- Significant gaps → proceed with another round
+- User can override anytime with "start writing", "generate plan", etc.
 
-**Question quality guidelines:**
-- Mix question types: clarifying, exploring edge cases, confirming assumptions, probing constraints
-- Avoid repeating questions already answered
-- Build on previous answers - go deeper, not wider, as rounds progress
-- Ask about risks, failure modes, and "what if" scenarios in later rounds
-- Cover both functional and non-functional aspects naturally
+**Question rules:**
+- Agent-driven — ask what matters most based on all context so far
+- No repeats from previous rounds
+- Go deeper (not wider) as rounds progress
+- Cover functional, non-functional, risks, edge cases naturally
 
-**Candidate answer guidelines:**
-- Each question must have exactly 4 options (the 5th "Other" option is added automatically by the tool)
-- Options should span a **spectrum of plausible directions** for that question:
-  - From conservative/minimal to ambitious/comprehensive
-  - From simple/standard to complex/custom
-  - From common industry practice to domain-specific approach
-- Options must be **mutually distinct** - avoid two options that say roughly the same thing
-- Options should be **concise but specific** - one sentence or short phrase, not a paragraph
-- Options should be **contextually grounded** in what has been discussed so far, not generic
-- Do NOT include an "I don't know" or "Not sure" option - that is what the "Other" free-text option covers
-- When asking about technical choices (e.g., architecture, data model), include concrete named approaches (e.g., "REST API with PostgreSQL" rather than "Option A")
-- When asking about scope or priority, frame options as specific trade-offs (e.g., "Support only email login at launch" vs. "Support email + OAuth from day one")
+**Candidate answer rules:**
+- Exactly 4 options per question (5th "Other" is automatic)
+- Span a spectrum: conservative → ambitious, simple → complex, standard → custom
+- Mutually distinct, concise, contextually grounded
+- No "I don't know" options — that's what "Other" covers
+- Use concrete named approaches, not "Option A"
 
-### Phase 2: Spec Writing (Sequential with Review)
+## Phase 2: Spec Writing
 
-Once the user agrees to start writing, proceed in this exact order:
+Sequential writing with user approval at each step.
 
-#### Step 2.1: Master Plan
+### 2.1: Master Plan
 
-1. Write `docs/plans/<topic-name>/master-plan.md` containing:
-   - Project/feature overview and goals
-   - Scope definition (what's in, what's out)
-   - High-level architecture or approach
-   - Key design decisions and rationale
-   - Dependencies and assumptions
-   - Risk assessment
-   - Table of contents linking to all spec files that will be created
-2. Present the full content of `master-plan.md` to the user
-3. Ask for approval or edits
-4. If the user requests changes, apply them and re-present until approved
-5. Only proceed to spec files after the master plan is approved
+Write `master-plan.md`: overview, goals, scope (in/out), architecture, design decisions, dependencies, risks, TOC linking to spec files.
 
-#### Step 2.2: Planning Configuration
+Present → user approves → proceed. Revise until approved.
 
-After the master plan is approved, configure the planning scope with **two** `AskUserQuestion` calls:
+### 2.2: Planning Configuration
 
-1. **Spec file count** — Analyze the master plan and recommend a number of spec files with a brief rationale, then ask:
-   - Option 1: `"N files (Recommended)"` — the agent's recommended count with a one-line reason
-   - Option 2: `"1-3 files (Compact)"` — for simple projects
-   - Option 3: `"4-7 files (Balanced)"` — for moderate complexity
-   - Option 4: `"8-10 files (Comprehensive)"` — for large projects
-   - (User can always enter a custom number via the automatic "Other" option)
-   - If the user selects a range, follow up to confirm the exact number within that range
+Two `AskUserQuestion` calls:
 
-2. **TODO file preference** — Ask whether to generate TODO files after specs are complete:
-   - Option 1: `"Yes, generate TODO files"` — create actionable task checklists after spec approval
-   - Option 2: `"No, specs only"` — complete planning with specs only
+1. **Spec file count:**
+   - Option 1: `"N files (Recommended)"` — agent's recommendation with rationale
+   - Option 2: `"1-3 files (Compact)"`
+   - Option 3: `"4-7 files (Balanced)"`
+   - Option 4: `"8-10 files (Comprehensive)"`
 
-#### Step 2.3: Detailed Spec Files
+2. **TODO preference:**
+   - Option 1: `"Yes, full TODO files with dependency analysis"`
+   - Option 2: `"Yes, lightweight TODOs (checklists only, no dependency metadata)"`
+   - Option 3: `"No, specs only — I'll plan tasks myself"`
+   - Option 4: `"Let me decide per-spec after reviewing them"`
 
-1. Using the spec file count confirmed by the user in Step 2.2, create the spec files
-2. Name them with numeric prefixes: `specs/01-<name>.md`, `specs/02-<name>.md`, etc.
-3. For EACH spec file, sequentially:
-   a. Write the file using natural language descriptions, pseudo-code, and text-based diagrams (mermaid syntax)
-   b. **No real code** - only pseudo-code where algorithms need to be clear
-   c. Present the full content to the user
-   d. Ask for approval or edits
-   e. If the user requests changes, apply them and re-present until approved
-   f. Only move to the next spec file after the current one is approved
+### 2.3: Detailed Spec Files
 
-**Spec file content guidelines:**
-- Use natural language as the primary medium
-- Include pseudo-code blocks for complex logic or algorithms
-- Include mermaid diagrams for data flow, state machines, or architecture
-- Describe interfaces, data models, and behavior - not implementation details
-- Each spec file should be self-contained and focused on one aspect/module
+Create `specs/01-<name>.md`, `specs/02-<name>.md`, etc. For EACH file sequentially:
 
-#### Step 2.4: TODO Files (Conditional)
+1. Write using natural language, pseudo-code, mermaid diagrams — **no real code**
+2. Present → user approves → next file. Revise until approved.
 
-If the user chose to generate TODO files in Step 2.2, execute this step; otherwise skip to Phase 3.
+Each spec: self-contained, one aspect/module, describes interfaces and behavior (not implementation).
 
-1. Create one TODO file per spec file: `todos/01-<name>.md`, `todos/02-<name>.md`, etc.
-2. Each TODO file contains:
-   - Reference to its corresponding spec file
-   - A checklist of actionable tasks (using `- [ ]` markdown checkboxes)
-   - Tasks ordered by implementation sequence
-   - Each task described clearly enough for a developer to act on
-3. Present ALL TODO files together as a batch for review
-4. Ask the user to review and approve (or request changes)
-5. Apply any changes and re-present until approved
+### 2.4: TODO Files with Dependencies (Conditional)
 
-### Phase 3: Completion
+Skip to 2.5 if user chose Option 3 ("No, specs only"). Task Orchestration is always generated regardless.
 
-1. Present a summary of everything generated:
-   - Master plan file path
-   - List of all spec files
-   - List of all TODO files (if generated) or note that TODO files were not created
-2. If TODO files were generated, ask: "Ready to start implementation, or do you want to revisit any part of the plan?"
-3. If TODO files were NOT generated, ask: "The planning phase is complete. Would you like to generate TODO files now, or are you ready to proceed with your own implementation approach?"
+If user chose Option 4 ("Let me decide per-spec"), ask per spec file whether to generate a TODO for it.
 
-## Output Structure
+Create `todos/01-<name>.md` per spec. Each TODO file contains:
+- Reference to corresponding spec
+- `- [ ]` task checklist ordered by implementation sequence
 
-```
-docs/plans/<topic-name>/
-├── master-plan.md          # Overall project plan and architecture
-├── specs/                  # Detailed design documents
-│   ├── 01-<name>.md
-│   ├── 02-<name>.md
-│   ├── 03-<name>.md
-│   └── ...
-└── todos/                  # [OPTIONAL] Actionable task checklists
-    ├── 01-<name>.md
-    ├── 02-<name>.md
-    ├── 03-<name>.md
-    └── ...
-```
+**If user chose Option 1 ("full TODO files")**, also include:
+- **`## Dependencies` section at top:**
+  - `depends_on: [01, 03]` — which TODOs must complete first
+  - `blocks: [04, 05]` — which TODOs wait on this one
+  - `parallel_group: A` — same letter = can run in parallel
+  - Brief explanation of WHY each dependency exists
 
-**Note:** The `todos/` directory is only created if the user chooses to generate TODO files.
+**If user chose Option 2 ("lightweight TODOs")**, omit dependency metadata. The orchestration file (Step 2.5) will derive dependencies from spec relationships instead.
 
-## Key Principles
+Present ALL as batch → user approves. Revise until approved.
 
-- **8 questions per round** - Always present exactly 8, delivered via two `AskUserQuestion` calls of 4 each
-- **Candidate answers** - Every question offers 4 agent-crafted candidate options plus an automatic "Other" for free-text input
-- **Agent-driven questions** - No rigid categories; ask what matters most right now
-- **User controls the pace** - User can trigger spec writing at any time
-- **Sequential approval** - Each spec file must be approved before the next is written
-- **No real code** - Pseudo-code and diagrams only; this is a planning tool, not a coding tool
-- **Language flexibility** - Determine the working language at the start and stay consistent
-- **Incremental refinement** - Each Q&A round builds on all previous knowledge
-- **User-controlled scope** - User decides spec count and TODO preference after master plan approval
-- **Agent recommends, user decides** - Agent analyzes the master plan and proposes a recommended spec count; user makes the final call
-- **Optional TODO generation** - Let users decide if they need task checklists or prefer their own implementation approach
+### 2.5: Task Orchestration File
 
-## Red Flags
+Generate `task-orchestration.md`. See [orchestration-guide.md](orchestration-guide.md) for detailed section specs.
 
-- Starting to write spec files before the user has agreed to begin
-- Writing real/concrete code instead of pseudo-code
-- Skipping user approval on any spec file
-- Asking fewer or more than 8 questions per round
-- Providing fewer than 4 or more than 4 candidate answers per question
-- Providing generic or overlapping candidate answers that don't offer real choice
-- Repeating questions already answered in previous rounds
-- Starting to write spec files without confirming the count with the user
-- Ignoring the user's chosen spec count and creating a different number of files
-- Generating TODO files without asking the user first
-- Generating TODO tasks that don't trace back to approved specs (when TODOs are generated)
-- Changing the working language mid-process without user consent
-- Moving to the next spec file before the current one is approved
+**5 required sections:**
 
-## Compatibility
+| Section | Content |
+|---------|---------|
+| 1. Dependency Graph | Mermaid `graph TD`, nodes = tasks, edges = dependencies, color by parallel group |
+| 2. Execution Phases | Phase 1 (no deps) → Phase 2 (depends on Phase 1) → Phase N. Max 5-7 concurrent agents |
+| 3. Critical Path | Longest dependency chain, bottleneck tasks highlighted |
+| 4. Agent Assignments | Recommended agent count, task-to-agent mapping, coordination notes |
+| 5. Context Files | Required reading list per agent (all planning docs + focused files) |
 
-This skill uses only standard tools available in both Claude Code CLI and Claude Code X:
-- `Read`, `Write`, `Edit` for file operations
-- `Glob`, `Grep` for project exploration
-- `AskUserQuestion` for structured choices
-- `Bash` only for creating directories
+**Without TODOs:** Derive task units and dependencies from spec modules and master plan. Orchestration file becomes the SOLE dependency source.
 
-No environment-specific features are used.
+Present → user approves. Revise until approved.
+
+## Phase 3: Development Decision
+
+Present summary of all generated files, then ask via `AskUserQuestion`:
+
+**If TODOs WERE generated:**
+- Option 1: `"Yes, assemble a development team and start coding"`
+- Option 2: `"Not now, I'll start development later"`
+- Option 3: `"I want to revisit some parts of the plan first"`
+- Option 4: `"Export the plan and share with my team"`
+
+**If TODOs were NOT generated:**
+- Option 1: `"Yes, assemble a development team and start coding"` (warn: TODOs recommended)
+- Option 2: `"Generate TODO files first, then decide"`
+- Option 3: `"Not now, I'll start development later"`
+- Option 4: `"I want to revisit some parts of the plan first"`
+
+## Phase 4: Development Team Assembly
+
+### 4.1: Team Role Selection
+
+Ask via `AskUserQuestion` — see [team-profiles.md](team-profiles.md) for full persona details:
+
+- Option 1: **`"Google Core Engineering Team"`** (Default) — scalable systems, clean architecture, testing culture
+- Option 2: **`"DeepMind AI/ML Engineering Team"`** — ML pipelines, algorithm design, research-to-prod
+- Option 3: **`"Meta Infrastructure & Product Team"`** — distributed systems, React, rapid iteration
+- Option 4: **`"Stripe Developer Platform Team"`** — API excellence, security-first, bulletproof error handling
+
+"Other" → user provides custom team persona (used verbatim).
+
+### 4.2: Team Composition
+
+Analyze `task-orchestration.md` Section 4. For each agent, prepare an assignment brief — see [orchestration-guide.md](orchestration-guide.md) for the brief template. Brief includes: identity, assigned tasks, dependencies, parallel peers, required reading, coordination notes, completion criteria.
+
+Present team composition → user approves.
+
+### 4.3: Launch Development Team
+
+Create agents via `TeamCreate` / `TaskCreate` following execution phases:
+
+- **Phase 1 agents launch in parallel** (no dependencies)
+- **Phase 2+ agents wait** until dependencies complete AND pass code review
+
+Each agent prompt MUST include — see [orchestration-guide.md](orchestration-guide.md) for the full template:
+- Team persona description
+- Instructions to READ all planning docs before coding
+- Specific task assignment and completion criteria
+- Dependency info
+- **"Do NOT mark task done. Report completion and wait for code review."**
+
+Monitor progress. Launch next-phase agents as dependencies are satisfied. Report to user at each phase transition.
+
+**On agent failure:** Ask user — retry / reassign / skip / abort. See [orchestration-guide.md](orchestration-guide.md) for error handling details.
+
+## Phase 5: Code Review & Quality Assurance
+
+### 5.1: Per-Agent Code Review
+
+When a dev agent reports completion, launch a **Code Review agent** (same team persona). Review checklist:
+
+- **Correctness:** Implementation matches spec
+- **Code quality:** Clean code, proper naming, no smells
+- **Security:** No OWASP top 10 vulnerabilities introduced
+- **Testing:** Adequate and meaningful tests
+- **Integration:** Compatible with other agents' code
+- **TODO compliance:** All checklist items addressed
+
+See [orchestration-guide.md](orchestration-guide.md) for the full review prompt template.
+
+Issues found → fix directly. No issues → confirm pass. Only then mark task DONE.
+
+### 5.2: Integration Verification
+
+After ALL agents in a phase pass review: run test suites. Failures → identify cause → launch fix agent → re-review → re-test.
+
+Report phase status to user before launching next phase.
+
+### 5.3: Final Completion
+
+After all phases complete, present summary (tasks, reviews, tests, files modified). Ask via `AskUserQuestion`:
+
+- Option 1: `"Proceed to commit/PR creation"`
+- Option 2: `"Run additional verification or testing"`
+- Option 3: `"I want to make manual adjustments first"`
+- Option 4: `"End session, I'll handle the rest manually"`
+
+---
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Writing spec before user agrees to begin | Wait for explicit readiness signal |
+| Real code in planning phases (0-2) | Pseudo-code and mermaid diagrams only |
+| Skipping approval on any spec file | Each spec must be approved before the next |
+| ≠ 8 questions per round or ≠ 4 options each | Always exactly 8 questions × 4 candidates |
+| Generic/overlapping candidate answers | Span a spectrum of distinct, specific options |
+| Full TODO files missing dependency annotations | Include `depends_on`, `blocks`, `parallel_group` unless user chose lightweight |
+| Skipping orchestration file | Always generate `task-orchestration.md` |
+| Launching dev agents without user approval | User must approve team composition first |
+| Launching Phase N+1 before Phase N passes review | Phase-gated: complete + reviewed + tested |
+| Dev agents skip reading planning docs | ALL planning docs required reading before coding |
+| Marking task done without code review | Code review agent must confirm first |
+| Starting development without user consent | User explicitly chooses in Phase 3 |
+
+## Required Tools
+
+- `Read`, `Write`, `Edit` — file operations
+- `Glob`, `Grep` — project exploration
+- `AskUserQuestion` — structured choices (4 options, tool adds 5th "Other")
+- `Bash` — creating directories, running test suites
+- `TeamCreate`, `TaskCreate`, `SendMessage` — multi-agent workflows (Phase 4-5)
+
+Phase 0-2 works in any environment. Phase 4-5 requires multi-agent support.
